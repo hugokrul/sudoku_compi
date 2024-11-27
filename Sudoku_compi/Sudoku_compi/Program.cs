@@ -8,6 +8,7 @@
 
             board.LoadBoard();
             board.PrintBoard();
+            Console.WriteLine(board.checkBoard());
         }
     }
 }

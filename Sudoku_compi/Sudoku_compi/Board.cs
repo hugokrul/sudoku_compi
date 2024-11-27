@@ -38,6 +38,48 @@ namespace Sudoku_compi
             }
         }
 
+        // checks if there are more then 2 numbers bigger then 0 in line
+        public bool checkLine(List<int> line)
+        {
+            var lineInumerable = from x in line
+                                 where x > 0
+                                 select x;
+
+            List<int> lineList = lineInumerable.ToList();
+            return lineList.Count == lineList.Distinct().Count();
+        }
+
+        public bool checkBoard()
+        {
+            List<bool> checkedHorizontalLines = [];
+            List<bool> checkedVerticalLines = [];
+
+            List<int> horizontalLine = [];
+            List<int> verticalLine = [];
+            
+            for (int i = 0; i < board.GetLength(0); i++)
+            {
+                for (int j = 0; j < board.GetLength(1); j++)
+                {
+                    horizontalLine.Add(board[i, j]);
+                }
+                checkedHorizontalLines.Add(checkLine(horizontalLine));
+                horizontalLine.Clear();
+            }
+
+            for (int i = 0; i < board.GetLength(0); i++)
+            {
+                for (int j = 0; j < board.GetLength(1); j++)
+                {
+                    verticalLine.Add(board[j, i]);
+                }
+                checkedVerticalLines.Add(checkLine(verticalLine));
+                verticalLine.Clear();
+            }
+
+            return checkedHorizontalLines.TrueForAll(x => x) && checkedVerticalLines.TrueForAll(x => x);
+        }
+
         public void PrintBoard()
         {
             Console.WriteLine(@"/ - - - - - - - - - - - \");
