@@ -10,17 +10,18 @@ namespace Sudoku_compi
     {
         public int[,] board = new int[9, 9];
         public string BoardName;
+        public string BoardFile;
 
-        public Board()
+        public Board(string boardFile)
         {
-
+            BoardFile = boardFile;
         }
 
-        public void LoadBoard(string fileName)
+        public void LoadBoard()
         {
-            if (File.Exists(fileName))
+            if (File.Exists(BoardFile))
             {
-                string[] strings = File.ReadAllLines(fileName);
+                string[] strings = File.ReadAllLines(BoardFile);
                 BoardName = strings[0];
                 string[] BoardNumbers = strings[1].Split(' ').Skip(1).ToArray();
 
@@ -28,7 +29,7 @@ namespace Sudoku_compi
                 {
                     for (int j = 0; j < 9; j++)
                     {
-                        board[i, j] = int.Parse(BoardNumbers[i*j]);
+                        board[i, j] = int.Parse(BoardNumbers[9*i+j]);
                     }
                 }
             } else
@@ -39,16 +40,20 @@ namespace Sudoku_compi
 
         public void PrintBoard()
         {
+            Console.WriteLine(@"/ - - - - - - - - - - - \");
             for (int i = 0;i < board.GetLength(0); i++)
             {
                 for (int j = 0; j < board.GetLength(1); j++)
                 {
-                    if (j % 3 == 0 && j != 0) Console.Write("| ");
-                    Console.Write($"|{board[i, j]}");
+                    if (j % 3 == 0 && j != 0) Console.Write(" |");
+                    if (j == 0) Console.Write($"| {board[i, j]}");
+                    else if (j == 8) Console.Write($" {board[i, j]} |");
+                    else Console.Write($" {board[i, j]}");
                 }
-                Console.WriteLine("|");
-                if ((i+1) % 3 == 0) Console.WriteLine();
+                Console.WriteLine();
+                if ((i + 1) % 3 == 0 && i != 8) Console.WriteLine("  - - - - - - - - - - -  ");
             }
+            Console.WriteLine(@"\ - - - - - - - - - - - /");
         }
     }
 }

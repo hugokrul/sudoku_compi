@@ -4,9 +4,9 @@
     {
         static void Main(string[] args)
         {
-            Board board = new Board();
+            Board board = new Board(@"../../../testBoards1.txt");
 
-            board.LoadBoard(@"../../../testBoards1.txt");
+            board.LoadBoard();
             board.PrintBoard();
         }
     }
