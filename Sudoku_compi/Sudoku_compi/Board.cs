@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Text.RegularExpressions;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Sudoku_compi
 {
@@ -119,11 +118,12 @@ namespace Sudoku_compi
                         }
                     }
                     checkedBoxes.Add(checkLine(boxes));
-                    checkedBoxes.Clear();
+                    boxes.Clear();
                 }
             }
+
             // if all lines are correct, i.e., the list is full of Trues and bigger then 0
-            return checkedHorizontalLines.TrueForAll(x => x) && checkedHorizontalLines.Count > 0 && checkedVerticalLines.TrueForAll(x => x) && checkedVerticalLines.Count > 0 && checkedBoxes.TrueForAll(x => x); ;
+            return checkedHorizontalLines.TrueForAll(x => x) && checkedHorizontalLines.Count > 0 && checkedVerticalLines.TrueForAll(x => x) && checkedVerticalLines.Count > 0 && checkedBoxes.TrueForAll(x => x) && checkedBoxes.Count > 0;
         }
 
         // prints the board in a pretty way
