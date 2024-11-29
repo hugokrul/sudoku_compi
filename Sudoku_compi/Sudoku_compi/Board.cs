@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Text.RegularExpressions;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Sudoku_compi
 {
@@ -76,9 +77,11 @@ namespace Sudoku_compi
         {
             List<bool> checkedHorizontalLines = [];
             List<bool> checkedVerticalLines = [];
+            List<bool> checkedBoxes = [];
 
             List<int> horizontalLine = [];
             List<int> verticalLine = [];
+            List<int> boxes = [];
             
             // checks all the horizontal lines with checkLine
             for (int i = 0; i < b.GetLength(0); i++)
@@ -102,8 +105,25 @@ namespace Sudoku_compi
                 verticalLine.Clear();
             }
 
+            //Check the 9 boxes
+            for (int bh = 0; bh < 3; bh++)
+            {
+                for (int bv = 0; bv < 9; bv++)
+                {
+                    List<int> ls = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+                    for (int i = 3 * bh; i < 3; i++)
+                    {
+                        for (int j = 3 * bv; j < 3; j++)
+                        {
+                            boxes.Add(board[j, i]);
+                        }
+                    }
+                    checkedBoxes.Add(checkLine(boxes));
+                    checkedBoxes.Clear();
+                }
+            }
             // if all lines are correct, i.e., the list is full of Trues and bigger then 0
-            return checkedHorizontalLines.TrueForAll(x => x) && checkedHorizontalLines.Count > 0 && checkedVerticalLines.TrueForAll(x => x) && checkedVerticalLines.Count > 0;
+            return checkedHorizontalLines.TrueForAll(x => x) && checkedHorizontalLines.Count > 0 && checkedVerticalLines.TrueForAll(x => x) && checkedVerticalLines.Count > 0 && checkedBoxes.TrueForAll(x => x); ;
         }
 
         // prints the board in a pretty way
