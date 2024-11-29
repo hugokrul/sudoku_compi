@@ -109,7 +109,6 @@ namespace Sudoku_compi
             {
                 for (int bv = 0; bv < 9; bv++)
                 {
-                    List<int> ls = [1, 2, 3, 4, 5, 6, 7, 8, 9];
                     for (int i = 3 * bh; i < 3; i++)
                     {
                         for (int j = 3 * bv; j < 3; j++)
