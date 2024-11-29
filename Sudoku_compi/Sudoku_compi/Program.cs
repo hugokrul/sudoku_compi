@@ -4,11 +4,10 @@
     {
         static void Main(string[] args)
         {
-            Board board = new Board(@"../../../testBoards1.txt");
+            Board board = new Board(@"../../../testBoards3.txt");
 
-            board.LoadBoard();
             board.PrintBoard();
-            Console.WriteLine(board.checkBoard());
+            Console.WriteLine(board.checkBoard(board.board));
         }
     }
 }

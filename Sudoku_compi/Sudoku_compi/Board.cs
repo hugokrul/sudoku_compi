@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Text.RegularExpressions;
 
 namespace Sudoku_compi
 {
@@ -15,22 +16,39 @@ namespace Sudoku_compi
         public Board(string boardFile)
         {
             BoardFile = boardFile;
+            // loads the board
+            // file content has to match: @"(Grid  \d\d*\r\n)+( \d){81,81}"
+            LoadBoard();
         }
 
         public void LoadBoard()
         {
+            // checks if the file exists
             if (File.Exists(BoardFile))
             {
-                string[] strings = File.ReadAllLines(BoardFile);
-                BoardName = strings[0];
-                string[] BoardNumbers = strings[1].Split(' ').Skip(1).ToArray();
-
-                for (int i = 0; i < 9; i++)
+                // checks if the content of the file matches:
+                // Grid  digitdigit
+                //  81 digits with spaces in front
+                string boardString = File.ReadAllText(BoardFile);
+                if (Regex.IsMatch(File.ReadAllText(BoardFile), @"(Grid  \d\d*\r\n)+( \d){81,81}$"))
                 {
-                    for (int j = 0; j < 9; j++)
+                    string[] strings = File.ReadAllLines(BoardFile);
+                    // The boardname is the first element in the string
+                    BoardName = strings[0];
+                    // the next elements are the numbers in the board, the first element is "" because of a space at the front, we skip that space
+                    string[] BoardNumbers = strings[1].Split(' ').Skip(1).ToArray();
+
+                    for (int i = 0; i < board.GetLength(0); i++)
                     {
-                        board[i, j] = int.Parse(BoardNumbers[9*i+j]);
+                        for (int j = 0; j < board.GetLength(1); j++)
+                        {
+                            // first x digits are the first line, next x digits are the next line, etc
+                            board[i, j] = int.Parse(BoardNumbers[board.GetLength(0)*i+j]);
+                        }
                     }
+                } else
+                {
+                    Console.WriteLine("non correct format");
                 }
             } else
             {
@@ -38,18 +56,23 @@ namespace Sudoku_compi
             }
         }
 
-        // checks if there are more then 2 numbers bigger then 0 in line
+        // checks if a line is correct, i.e., it contains no duplicate digits except 0
         public bool checkLine(List<int> line)
         {
+            // C# has no map, so
+            // with inumerable we can easy map over the digits
             var lineInumerable = from x in line
                                  where x > 0
                                  select x;
 
             List<int> lineList = lineInumerable.ToList();
+            // checks if there are no duplicates without 0
             return lineList.Count == lineList.Distinct().Count();
         }
 
-        public bool checkBoard()
+        // returns if the state board is possible
+        // input is a board, so we can check it for future states too
+        public bool checkBoard(int[,] b)
         {
             List<bool> checkedHorizontalLines = [];
             List<bool> checkedVerticalLines = [];
@@ -57,29 +80,33 @@ namespace Sudoku_compi
             List<int> horizontalLine = [];
             List<int> verticalLine = [];
             
-            for (int i = 0; i < board.GetLength(0); i++)
+            // checks all the horizontal lines with checkLine
+            for (int i = 0; i < b.GetLength(0); i++)
             {
-                for (int j = 0; j < board.GetLength(1); j++)
+                for (int j = 0; j < b.GetLength(1); j++)
                 {
-                    horizontalLine.Add(board[i, j]);
+                    horizontalLine.Add(b[i, j]);
                 }
                 checkedHorizontalLines.Add(checkLine(horizontalLine));
                 horizontalLine.Clear();
             }
 
-            for (int i = 0; i < board.GetLength(0); i++)
+            // checks all the vertical lines with checkLine
+            for (int i = 0; i < b.GetLength(0); i++)
             {
-                for (int j = 0; j < board.GetLength(1); j++)
+                for (int j = 0; j < b.GetLength(1); j++)
                 {
-                    verticalLine.Add(board[j, i]);
+                    verticalLine.Add(b[j, i]);
                 }
                 checkedVerticalLines.Add(checkLine(verticalLine));
                 verticalLine.Clear();
             }
 
-            return checkedHorizontalLines.TrueForAll(x => x) && checkedVerticalLines.TrueForAll(x => x);
+            // if all lines are correct, i.e., the list is full of Trues and bigger then 0
+            return checkedHorizontalLines.TrueForAll(x => x) && checkedHorizontalLines.Count > 0 && checkedVerticalLines.TrueForAll(x => x) && checkedVerticalLines.Count > 0;
         }
 
+        // prints the board in a pretty way
         public void PrintBoard()
         {
             Console.WriteLine(@"/ - - - - - - - - - - - \");
