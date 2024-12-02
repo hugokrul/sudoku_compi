@@ -9,6 +9,7 @@ namespace Sudoku_compi
 {
     public class Board
     {
+        static Random rnd = new Random();
         public int[,] board = new int[9, 9];
         public string BoardName;
         public string BoardFile;
@@ -20,6 +21,45 @@ namespace Sudoku_compi
             // loads the board
             // file content has to match: @"(Grid  \d\d*\r\n)+( \d){81,81}"
             LoadBoard();
+            filledBoard(board);
+        }
+
+        // returns a board where all the zeros are filled in with numbers available in that box
+        public int[,] filledBoard(int[,] b)
+        {
+            for (int boxX = 0; boxX < 3; boxX++)
+            {
+                for (int boxY = 0; boxY < 3; boxY++)
+                {
+                    List<int> availableNumbers = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+
+                    // removes a number from the list of available numbers, if that number is already in the box
+                    for (int i = 0; i < 3; i++)
+                    {
+                        for (int j = 0; j < 3; j++)
+                        {
+                            var element = b[i + 3*boxX, j + 3*boxY];
+                            if (availableNumbers.Contains(element)) availableNumbers.Remove(element);
+                        }
+                    }
+
+                    // filles the 0 with random numbers available
+                    for (int i = 0; i < 3; i++)
+                    {
+                        for (int j = 0; j < 3; j++)
+                        {
+                            var element = b[i+ 3*boxX, j + 3*boxY];
+                            if (element == 0)
+                            {
+                                var randomNumber = availableNumbers[rnd.Next(availableNumbers.Count)];
+                                b[i+ 3*boxX, j+3*boxY] = randomNumber;
+                                availableNumbers.Remove(randomNumber);
+                            }
+                        }
+                    }
+                }
+            }
+            return board;
         }
 
         public void LoadBoard()
