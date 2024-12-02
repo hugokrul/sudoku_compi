@@ -12,6 +12,7 @@ namespace Sudoku_compi
         public int[,] board = new int[9, 9];
         public string BoardName;
         public string BoardFile;
+        public bool[,] boolMatrix = new bool[9, 9]; //True if it contains a fixed value
 
         public Board(string boardFile)
         {
@@ -43,7 +44,11 @@ namespace Sudoku_compi
                         for (int j = 0; j < board.GetLength(1); j++)
                         {
                             // first x digits are the first line, next x digits are the next line, etc
-                            board[i, j] = int.Parse(BoardNumbers[board.GetLength(0)*i+j]);
+                            int val = int.Parse(BoardNumbers[board.GetLength(0) * i + j]);
+                            board[i, j] = val;
+
+                            if (val == 0) { boolMatrix[i, j] = false; }
+                            else { boolMatrix[i, j] = true; }
                         }
                     }
                 } else
