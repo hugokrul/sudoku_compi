@@ -24,6 +24,15 @@ namespace Sudoku_compi
             filledBoard(board);
         }
 
+        public int lineHeuristic(int[] line)
+        {
+            var lineInumerable = from x in line
+                                 where x > 0
+                                 select x;
+
+            return 9 - lineInumerable.Count();
+        }
+
         // returns a board where all the zeros are filled in with numbers available in that box
         public int[,] filledBoard(int[,] b)
         {
