@@ -21,7 +21,6 @@ namespace Sudoku_compi
             // loads the board
             // file content has to match: @"(Grid  \d\d*\r\n)+( \d){81,81}"
             LoadBoard();
-            filledBoard(board);
         }
 
         public int lineHeuristic(int[] line)
@@ -29,12 +28,39 @@ namespace Sudoku_compi
             var lineInumerable = from x in line
                                  where x > 0
                                  select x;
+            return 9 - lineInumerable.Distinct().Count();
+        }
 
-            return 9 - lineInumerable.Count();
+        public int boardHeuristic(int[,] b)
+        {
+            int h = 0;
+            List<int> line = [];
+
+            for (int i = 0; i < b.GetLength(0); i++)
+            {
+                for (int j = 0; j < b.GetLength(1); j++)
+                {
+                    line.Add(b[i, j]);
+                }
+                h += lineHeuristic(line.ToArray());
+                line.Clear();
+            }
+
+            for (int i = 0; i < b.GetLength(0); i++)
+            {
+                for (int j = 0; j < b.GetLength(1); j++)
+                {
+                    line.Add(b[j,i]);
+                }
+                h += lineHeuristic(line.ToArray());
+                line.Clear();
+            }
+
+            return h;
         }
 
         // returns a board where all the zeros are filled in with numbers available in that box
-        public int[,] filledBoard(int[,] b)
+        public int[,] fillBoard(int[,] b)
         {
             for (int boxX = 0; boxX < 3; boxX++)
             {
