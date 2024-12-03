@@ -97,6 +97,35 @@ namespace Sudoku_compi
             return board;
         }
 
+        public List<((int, int), (int, int))> getLegalSwaps((int, int) box) //Here box is a coordinate which points to the specific 3x3 square we want the swaps from. Structured as x(vertical), y(horizontal) where 0,0 is topleft
+        {
+            List<(int, int)> unfixedCoordinates = [];
+            List <((int, int), (int, int))> swaps = [];
+            int X = box.Item1 * 3;
+            int Y = box.Item2 * 3;
+
+            for (int x = X; x < X + 3;  x++)
+            {
+                for (int y = Y; y < Y + 3; y++)
+                {
+                    if (!boolMatrix[x, y]) unfixedCoordinates.Add((x, y));
+                }
+            }
+
+            int c = unfixedCoordinates.Count;
+            for (int i = 0; i < c; i++)
+            {
+                (int, int) c1 = unfixedCoordinates[i];
+                for (int j = i + 1; j < c; j++)
+                {
+                    (int, int) c2 = unfixedCoordinates[j];
+                    swaps.Add((c1, c2));
+                }
+            }
+
+            return swaps;
+        }
+
         public void LoadBoard()
         {
             // checks if the file exists
