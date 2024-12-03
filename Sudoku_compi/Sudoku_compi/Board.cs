@@ -13,6 +13,8 @@ namespace Sudoku_compi
         public string BoardName;
         public string BoardFile;
         public bool[,] boolMatrix = new bool[9, 9]; //True if it contains a fixed value
+        public int[] rowHVals = new int[9];
+        public int[] colHVals = new int[9];
 
         public Board(string boardFile)
         {
@@ -147,6 +149,56 @@ namespace Sudoku_compi
                 if ((i + 1) % 3 == 0 && i != 8) Console.WriteLine("  - - - - - - - - - - -  ");
             }
             Console.WriteLine(@"\ - - - - - - - - - - - /");
+        }
+
+        public List<int[]> coordsToLines(Tuple<int,int> coord1, Tuple<int,int> coord2)
+        {
+            List<int[]> lines = new List<int[]>();
+
+            // In this row the value of coord1 is replaced by the value of coord2
+            int[] row1 = Enumerable.Range(0, 9)
+                .Select(i => board[i, coord1.Item2])
+                .ToArray();
+            
+            row1[coord1.Item1] = board[coord2.Item1, coord2.Item2];
+            lines.Add(row1);
+
+            // If the y coordinates are different, two rows will be affected
+            if (coord1.Item2 != coord2.Item2)
+            {
+                // In this row the value of coord2 is replaced with the value of coord1
+                int[] row2 = Enumerable.Range(0, 9)
+                    .Select(i => board[i, coord2.Item2])
+                    .ToArray();
+                
+                row2[coord2.Item1] = board[coord1.Item1, coord1.Item2];
+                lines.Add(row2);
+            }
+
+            // In this column the value of coord1 is replaced by the value of coord2
+            int[] col1 = Enumerable.Range(0, 9)
+                .Select(i => board[coord1.Item1, i])
+                .ToArray();
+            
+            col1[coord1.Item2] = board[coord2.Item1, coord2.Item2];
+            lines.Add(col1);
+
+            // If the x coordinates are different, two columns will be affected
+            if (coord1.Item1 != coord2.Item1)
+            {
+                // In this row the value of coord2 is replaced with the value of coord1
+                int[] col2 = Enumerable.Range(0, 9)
+                    .Select(i => board[i, coord2.Item1])
+                    .ToArray();
+                
+                col2[coord2.Item2] = board[coord1.Item1, coord1.Item2];
+                lines.Add(col2);
+            }
+            
+            // lines contains the new columns and rows after the swap in the order:
+            // First the rows, starting with row of coord1 then coord2
+            // then the columns, starting with column of coord1 then coord2
+            return lines;
         }
     }
 }
