@@ -185,11 +185,9 @@ namespace Sudoku_compi
         {
             List<bool> checkedHorizontalLines = [];
             List<bool> checkedVerticalLines = [];
-            List<bool> checkedBoxes = [];
 
             List<int> horizontalLine = [];
             List<int> verticalLine = [];
-            List<int> boxes = [];
             
             // checks all the horizontal lines with checkLine
             for (int i = 0; i < b.GetLength(0); i++)
@@ -213,25 +211,9 @@ namespace Sudoku_compi
                 verticalLine.Clear();
             }
 
-            //Check the 9 boxes
-            for (int bh = 0; bh < 3; bh++)
-            {
-                for (int bv = 0; bv < 9; bv++)
-                {
-                    for (int i = 3 * bh; i < 3; i++)
-                    {
-                        for (int j = 3 * bv; j < 3; j++)
-                        {
-                            boxes.Add(board[j, i]);
-                        }
-                    }
-                    checkedBoxes.Add(checkLine(boxes));
-                    boxes.Clear();
-                }
-            }
-
             // if all lines are correct, i.e., the list is full of Trues and bigger then 0
-            return checkedHorizontalLines.TrueForAll(x => x) && checkedHorizontalLines.Count > 0 && checkedVerticalLines.TrueForAll(x => x) && checkedVerticalLines.Count > 0 && checkedBoxes.TrueForAll(x => x) && checkedBoxes.Count > 0;
+            return  checkedHorizontalLines.TrueForAll(x => x) && checkedHorizontalLines.Count > 0 
+                    && checkedVerticalLines.TrueForAll(x => x) && checkedVerticalLines.Count > 0;
         }
 
         // prints the board in a pretty way
