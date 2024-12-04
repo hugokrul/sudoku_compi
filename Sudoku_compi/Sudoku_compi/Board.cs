@@ -104,6 +104,35 @@ namespace Sudoku_compi
             return board;
         }
 
+        public List<((int, int), (int, int))> getLegalSwaps((int, int) box) //Here box is a coordinate which points to the specific 3x3 square we want the swaps from. Structured as x(vertical), y(horizontal) where 0,0 is topleft
+        {
+            List<(int, int)> unfixedCoordinates = [];
+            List <((int, int), (int, int))> swaps = [];
+            int X = box.Item1 * 3;
+            int Y = box.Item2 * 3;
+
+            for (int x = X; x < X + 3;  x++)
+            {
+                for (int y = Y; y < Y + 3; y++)
+                {
+                    if (!boolMatrix[x, y]) unfixedCoordinates.Add((x, y));
+                }
+            }
+
+            int c = unfixedCoordinates.Count;
+            for (int i = 0; i < c; i++)
+            {
+                (int, int) c1 = unfixedCoordinates[i];
+                for (int j = i + 1; j < c; j++)
+                {
+                    (int, int) c2 = unfixedCoordinates[j];
+                    swaps.Add((c1, c2));
+                }
+            }
+
+            return swaps;
+        }
+
         public void LoadBoard()
         {
             // checks if the file exists
@@ -163,11 +192,9 @@ namespace Sudoku_compi
         {
             List<bool> checkedHorizontalLines = [];
             List<bool> checkedVerticalLines = [];
-            List<bool> checkedBoxes = [];
 
             List<int> horizontalLine = [];
             List<int> verticalLine = [];
-            List<int> boxes = [];
             
             // checks all the horizontal lines with checkLine
             for (int i = 0; i < b.GetLength(0); i++)
@@ -191,25 +218,9 @@ namespace Sudoku_compi
                 verticalLine.Clear();
             }
 
-            //Check the 9 boxes
-            for (int bh = 0; bh < 3; bh++)
-            {
-                for (int bv = 0; bv < 9; bv++)
-                {
-                    for (int i = 3 * bh; i < 3; i++)
-                    {
-                        for (int j = 3 * bv; j < 3; j++)
-                        {
-                            boxes.Add(board[j, i]);
-                        }
-                    }
-                    checkedBoxes.Add(checkLine(boxes));
-                    boxes.Clear();
-                }
-            }
-
             // if all lines are correct, i.e., the list is full of Trues and bigger then 0
-            return checkedHorizontalLines.TrueForAll(x => x) && checkedHorizontalLines.Count > 0 && checkedVerticalLines.TrueForAll(x => x) && checkedVerticalLines.Count > 0 && checkedBoxes.TrueForAll(x => x) && checkedBoxes.Count > 0;
+            return  checkedHorizontalLines.TrueForAll(x => x) && checkedHorizontalLines.Count > 0 
+                    && checkedVerticalLines.TrueForAll(x => x) && checkedVerticalLines.Count > 0;
         }
 
         // prints the board in a pretty way
