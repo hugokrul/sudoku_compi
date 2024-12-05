@@ -20,7 +20,7 @@ namespace Sudoku_compi
         // Keeps track of the scores of the columns
         public int[] colHVals = new int[9];
         // Tracks total score of the board; -1 is placeholder
-        public int boardScore = -1;
+        public int boardHScore = -1;
 
         public Board(string boardFile)
         {
@@ -28,6 +28,36 @@ namespace Sudoku_compi
             // loads the board
             // file content has to match: @"(Grid  \d\d*\r\n)+( \d){81,81}"
             LoadBoard();
+        }
+
+        // At the start of the program, calculate heuristic values of all rows and columns and the begin score of the board
+        public void InitHValArrays() 
+        {            
+            // Initiate rowHVals and colHVals; 
+            for (int i = 0; i < 9; i++)
+            {
+                int[] row = Enumerable.Range(0, 9)
+                    .Select(j => board[j, i])
+                    .ToArray();
+
+                rowHVals[i] = lineHeuristic(row);
+
+                int[] col = Enumerable.Range(0, 9)
+                    .Select(j => board[i, j])
+                    .ToArray();
+
+                colHVals[i] = lineHeuristic(col);
+            }
+        }
+
+        public void HValBoard ()
+        {
+            int tempBoardScore = 0;
+            for (int i = 0; i < 9; i++)
+            {
+                tempBoardScore += rowHVals[i] + colHVals[i];
+            }
+            boardHScore = tempBoardScore;
         }
 
         public int lineHeuristic(int[] line)
@@ -341,7 +371,7 @@ namespace Sudoku_compi
             colHVals[swap.Coord2.X] = swap.newHValCol2;
 
             // Finally, adjust the total score of the board
-            boardScore -= swap.Score;
+            boardHScore -= swap.Score;
         }
     }
 }
