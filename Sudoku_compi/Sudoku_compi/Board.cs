@@ -50,6 +50,7 @@ namespace Sudoku_compi
             }
         }
 
+        // Calculates the total heuristic value of the board; call at the start after InitHValArrays
         public void HValBoard ()
         {
             int tempBoardScore = 0;
@@ -272,6 +273,7 @@ namespace Sudoku_compi
             Console.WriteLine(@"\ - - - - - - - - - - - /");
         }
 
+        // Creates a Swap struct voor a given swap of two coords
         public Swap CoordsToSwap(Coord coord1, Coord coord2)
         {
             Swap swap = new Swap(coord1, coord2);
