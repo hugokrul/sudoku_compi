@@ -20,7 +20,7 @@ namespace Sudoku_compi
 
         private void ILS()
         {
-            List<(Coord,Coord)> swaps = new List<(Coord,Coord)>();
+            List<(Coord,Coord)> swaps = board.getLegalSwaps((1,1)); // For now 1,1; needs be randomized
             // Placeholder swap
             Swap placeHolder = new Swap(new Coord(-1,-1), new Coord(-1,-1));
             Swap bestSwap = placeHolder;

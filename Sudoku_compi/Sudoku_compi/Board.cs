@@ -135,10 +135,10 @@ namespace Sudoku_compi
             return board;
         }
 
-        public List<((int, int), (int, int))> getLegalSwaps((int, int) box) //Here box is a coordinate which points to the specific 3x3 square we want the swaps from. Structured as x(vertical), y(horizontal) where 0,0 is topleft
+        public List<(Coord, Coord)> getLegalSwaps((int, int) box) //Here box is a coordinate which points to the specific 3x3 square we want the swaps from. Structured as x(vertical), y(horizontal) where 0,0 is topleft
         {
             List<(int, int)> unfixedCoordinates = [];
-            List <((int, int), (int, int))> swaps = [];
+            List <(Coord, Coord)> swaps = [];
             int X = box.Item1 * 3;
             int Y = box.Item2 * 3;
 
@@ -157,7 +157,7 @@ namespace Sudoku_compi
                 for (int j = i + 1; j < c; j++)
                 {
                     (int, int) c2 = unfixedCoordinates[j];
-                    swaps.Add((c1, c2));
+                    swaps.Add((new Coord(c1.Item1, c1.Item2), new Coord(c2.Item1, c2.Item2)));
                 }
             }
 
