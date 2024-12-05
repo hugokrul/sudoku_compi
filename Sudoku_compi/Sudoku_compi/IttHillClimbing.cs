@@ -15,10 +15,10 @@ namespace Sudoku_compi
         public IttHillClimbing(Board sBoard) 
         {
             board = sBoard;
-            Start();
+            ILS();
         }
 
-        private void Start()
+        private void ILS()
         {
             List<(Coord,Coord)> swaps = new List<(Coord,Coord)>();
             // Placeholder swap
