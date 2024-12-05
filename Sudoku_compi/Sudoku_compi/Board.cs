@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Text.RegularExpressions;
+using System.Security.Cryptography;
 
 namespace Sudoku_compi
 {
@@ -14,6 +15,12 @@ namespace Sudoku_compi
         public string BoardName;
         public string BoardFile;
         public bool[,] boolMatrix = new bool[9, 9]; //True if it contains a fixed value
+        // Keeps track of the scores of the rows i.e. rowHVals[1] gives the score of row 1 
+        public int[] rowHVals = new int[9];
+        // Keeps track of the scores of the columns
+        public int[] colHVals = new int[9];
+        // Tracks total score of the board; -1 is placeholder
+        public int boardHScore = -1;
 
         public Board(string boardFile)
         {
@@ -21,6 +28,37 @@ namespace Sudoku_compi
             // loads the board
             // file content has to match: @"(Grid  \d\d*\r\n)+( \d){81,81}"
             LoadBoard();
+        }
+
+        // At the start of the program, calculate heuristic values of all rows and columns and the begin score of the board
+        public void InitHValArrays() 
+        {            
+            // Initiate rowHVals and colHVals; 
+            for (int i = 0; i < 9; i++)
+            {
+                int[] row = Enumerable.Range(0, 9)
+                    .Select(j => board[j, i])
+                    .ToArray();
+
+                rowHVals[i] = lineHeuristic(row);
+
+                int[] col = Enumerable.Range(0, 9)
+                    .Select(j => board[i, j])
+                    .ToArray();
+
+                colHVals[i] = lineHeuristic(col);
+            }
+        }
+
+        // Calculates the total heuristic value of the board; call at the start after InitHValArrays
+        public void HValBoard ()
+        {
+            int tempBoardScore = 0;
+            for (int i = 0; i < 9; i++)
+            {
+                tempBoardScore += rowHVals[i] + colHVals[i];
+            }
+            boardHScore = tempBoardScore;
         }
 
         public int lineHeuristic(int[] line)
@@ -97,10 +135,10 @@ namespace Sudoku_compi
             return board;
         }
 
-        public List<((int, int), (int, int))> getLegalSwaps((int, int) box) //Here box is a coordinate which points to the specific 3x3 square we want the swaps from. Structured as x(vertical), y(horizontal) where 0,0 is topleft
+        public List<(Coord, Coord)> getLegalSwaps((int, int) box) //Here box is a coordinate which points to the specific 3x3 square we want the swaps from. Structured as x(vertical), y(horizontal) where 0,0 is topleft
         {
             List<(int, int)> unfixedCoordinates = [];
-            List <((int, int), (int, int))> swaps = [];
+            List <(Coord, Coord)> swaps = [];
             int X = box.Item1 * 3;
             int Y = box.Item2 * 3;
 
@@ -119,7 +157,7 @@ namespace Sudoku_compi
                 for (int j = i + 1; j < c; j++)
                 {
                     (int, int) c2 = unfixedCoordinates[j];
-                    swaps.Add((c1, c2));
+                    swaps.Add((new Coord(c1.Item1, c1.Item2), new Coord(c2.Item1, c2.Item2)));
                 }
             }
 
@@ -233,6 +271,109 @@ namespace Sudoku_compi
                 if ((i + 1) % 3 == 0 && i != 8) Console.WriteLine("  - - - - - - - - - - -  ");
             }
             Console.WriteLine(@"\ - - - - - - - - - - - /");
+        }
+
+        // Creates a Swap struct voor a given swap of two coords
+        public Swap CoordsToSwap(Coord coord1, Coord coord2)
+        {
+            Swap swap = new Swap(coord1, coord2);
+            int totalDelta = 0;
+
+            swap.newValCoord1 = board[coord2.X,coord2.Y];
+            swap.newValCoord2 = board[coord1.X,coord1.Y];
+
+            // If the two coords share the same column
+            if (coord1.X == coord2.X)
+            {
+                // Value of column does not change so just set the new column values to the current value 
+                swap.newHValCol1 = colHVals[coord1.X];
+                swap.newHValCol2 = colHVals[coord1.X];
+            }
+            else
+            {
+                // In this column the value of coord1 is replaced by the value of coord2
+                int[] col1 = Enumerable.Range(0, 9)
+                    .Select(i => board[coord1.X, i])
+                    .ToArray();
+                
+                // Replace value of coord1 with value of coord2
+                col1[coord1.Y] = board[coord2.X, coord2.X];
+                // Calculate new value of col1
+                int hValCol1 = lineHeuristic(col1);
+                // Calculate difference between old and new column value;
+                // formula = old - new; a positive value means the row has gotten closer to completion
+                int col1Delta = colHVals[coord1.X] - hValCol1;
+                totalDelta += col1Delta;
+
+                swap.newHValCol1 = hValCol1;
+
+                // In this row the value of coord2 is replaced with the value of coord1
+                int[] col2 = Enumerable.Range(0, 9)
+                    .Select(i => board[i, coord2.X])
+                    .ToArray();
+                
+                col2[coord2.Y] = board[coord1.X, coord1.Y];
+                int hValCol2 = lineHeuristic(col2);
+                int col2Delta = colHVals[coord2.X] - hValCol2;
+                totalDelta += col2Delta;
+
+                swap.newHValCol2 = hValCol2;
+            }
+
+            // If the two coords share the same row
+            if (coord1.Y == coord2.Y)
+            {
+                // Value of the row does not changeso just set the new row values to the current row value
+                swap.newHValRow1 = rowHVals[coord1.Y];
+                swap.newHValRow2 = rowHVals[coord1.Y];
+            }
+            else 
+            {
+                // In this row the value of coord1 is replaced with the value of coord2
+                int[] row1 = Enumerable.Range(0, 9)
+                    .Select(i => board[i, coord1.Y])
+                    .ToArray();
+                
+                row1[coord1.X] = board[coord2.X, coord2.Y];
+                int hValRow1 = lineHeuristic(row1);
+                int row1Delta = rowHVals[coord1.Y] - hValRow1;
+                totalDelta += row1Delta;
+
+                swap.newHValRow1 = hValRow1;
+
+                // In this row the value of coord2 is replaced with the value of coord1
+                int[] row2 = Enumerable.Range(0, 9)
+                    .Select(i => board[i, coord2.Y])
+                    .ToArray();
+                
+                row2[coord2.X] = board[coord1.X, coord1.Y];
+                int hValRow2 = lineHeuristic(row2);
+                int row2Delta = rowHVals[coord2.Y] - hValRow2;
+                totalDelta += row2Delta;
+
+                swap.newHValRow2 = hValRow2;
+            }
+            swap.Score = totalDelta;
+
+            return swap;
+        }
+
+        public void CommitSwap(Swap swap)
+        {
+            // Swap the values on the board
+            board[swap.Coord1.X, swap.Coord1.Y] = swap.newValCoord1;
+            board[swap.Coord2.X, swap.Coord2.Y] = swap.newValCoord2;
+
+            // Set new values of rows
+            rowHVals[swap.Coord1.Y] = swap.newHValRow1;
+            rowHVals[swap.Coord2.Y] = swap.newHValRow2;
+
+            // Set new values of columns
+            colHVals[swap.Coord1.X] = swap.newHValCol1;
+            colHVals[swap.Coord2.X] = swap.newHValCol2;
+
+            // Finally, adjust the total score of the board
+            boardHScore -= swap.Score;
         }
     }
 }
