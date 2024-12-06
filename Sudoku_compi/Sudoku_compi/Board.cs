@@ -135,6 +135,20 @@ namespace Sudoku_compi
             return board;
         }
 
+
+        public void RandomWalk(int amount)
+        {
+            (int, int) box = (rnd.Next(2), rnd.Next(2));
+            List<(Coord, Coord)> legalSwaps = getLegalSwaps(box);
+            for (int i = 0; i < amount; i++)
+            {
+                int randomIndex = rnd.Next(legalSwaps.Count);
+                Swap randomSwap = CoordsToSwap(legalSwaps[randomIndex].Item1, legalSwaps[randomIndex].Item2);
+
+                CommitSwap(randomSwap);
+            }
+        }
+
         public List<(Coord, Coord)> getLegalSwaps((int, int) box) //Here box is a coordinate which points to the specific 3x3 square we want the swaps from. Structured as x(vertical), y(horizontal) where 0,0 is topleft
         {
             List<(int, int)> unfixedCoordinates = [];

@@ -32,6 +32,11 @@ namespace Sudoku_compi
             Coord1 = coord1;
             Coord2 = coord2;
         }
+
+        public override string ToString()
+        {
+            return $"Coord1: {Coord1.ToString()}, Coord2: {Coord2.ToString()}";
+        }
     }
 
 }
