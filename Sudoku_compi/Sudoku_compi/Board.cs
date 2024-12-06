@@ -138,13 +138,12 @@ namespace Sudoku_compi
 
         public void RandomWalk(int amount)
         {
-            (int, int) box = (rnd.Next(2), rnd.Next(2));
-            List<(Coord, Coord)> legalSwaps = getLegalSwaps(box);
             for (int i = 0; i < amount; i++)
             {
+                (int, int) box = (rnd.Next(3), rnd.Next(3));
+                List<(Coord, Coord)> legalSwaps = getLegalSwaps(box);
                 int randomIndex = rnd.Next(legalSwaps.Count);
                 Swap randomSwap = CoordsToSwap(legalSwaps[randomIndex].Item1, legalSwaps[randomIndex].Item2);
-
                 CommitSwap(randomSwap);
             }
         }
