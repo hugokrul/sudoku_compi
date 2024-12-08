@@ -21,26 +21,12 @@ namespace Sudoku_compi
 
         private void ILS()
         {
-            List<(Coord,Coord)> swaps = board.getLegalSwaps((1,1)); // For now 1,1; needs be randomized
-            // Placeholder swap
-            Swap placeHolder = new Swap(new Coord(-1,-1), new Coord(-1,-1));
-            Swap bestSwap = placeHolder;
-
-            foreach ((Coord,Coord) swap in swaps)
+            //First swap til optimum is reached
+            swapTilOptimum(1000, board);
+            //Then RandomWalk
+            if (board.boardHScore != 0)
             {
-                Swap newSwap = board.CoordsToSwap(swap.Item1, swap.Item2);
-                if (newSwap.Score >= bestSwap.Score)
-                    bestSwap = newSwap;
-            }
-
-            // Als de beste swap het bord verslechtert dan ...
-            if (bestSwap.Score < 0)
-            {
-                // Denk aan random walk iterator verhogen etc 
-            }
-            else 
-            {
-                board.CommitSwap(bestSwap);
+                //Randomwalkfunction
             }
         }
 
@@ -49,7 +35,9 @@ namespace Sudoku_compi
             int count = 0;
 
             while (count < ceiling)
-            {
+            {   
+                if (board.boardHScore == 0) { break; }
+                //Select random 3x3 box
                 int vIndex = rnd.Next(0, 3);
                 int hIndex = rnd.Next(0, 3);
 
@@ -58,9 +46,44 @@ namespace Sudoku_compi
 
                 foreach ((Coord, Coord) swap in cc)
                 {
+                    //Transform to Swap objects
                     swaps.Add(board.CoordsToSwap(swap.Item1, swap.Item2));
                 }
-                
+
+                int delta = -1;
+                //This list will hold the swap(s) with the highest delta
+                List<Swap> doSwaps = new();
+
+                foreach (Swap s in  swaps)
+                {
+                    if (s.Score > delta)
+                    {
+                        //If a better swap is found the old swaps need to be removed
+                        doSwaps.Clear();
+                        doSwaps.Add(s);
+                        delta = s.Score;
+                    }
+
+                    if (s.Score == delta)
+                    {
+                        doSwaps.Add(s);
+                    }
+                }
+
+                //Select random swap and commit
+                if (delta >= 0)
+                {
+                    int rIndex = rnd.Next(doSwaps.Count);
+                    Swap s = doSwaps[rIndex];
+                    board.CommitSwap(s);
+                }
+
+                //If there is an improvement, start count over
+                if (delta > 0) { count = 0; }
+                //If score stays the same, count 1 up
+                else if (delta == 0) { count++; }
+                //If the swaps only have negative delta, stop the while
+                else { count = ceiling; }
             }
 
 
