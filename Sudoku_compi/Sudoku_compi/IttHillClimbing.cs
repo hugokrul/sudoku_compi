@@ -35,7 +35,7 @@ namespace Sudoku_compi
             int count = 0;
 
             while (count < ceiling)
-            {   
+            {
                 if (board.boardHScore == 0) { break; }
                 //Select random 3x3 box
                 int vIndex = rnd.Next(0, 3);
