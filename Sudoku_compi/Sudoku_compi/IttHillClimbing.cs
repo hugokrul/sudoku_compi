@@ -12,6 +12,7 @@ namespace Sudoku_compi
     public class IttHillClimbing
     {
         Board board;
+        static Random rnd = new Random();
         public IttHillClimbing(Board sBoard) 
         {
             board = sBoard;
@@ -41,6 +42,28 @@ namespace Sudoku_compi
             {
                 board.CommitSwap(bestSwap);
             }
+        }
+
+        public void swapTilOptimum(int ceiling, Board board) //ceiling determines how many long the swapping will continue without a score delta above 0
+        {
+            int count = 0;
+
+            while (count < ceiling)
+            {
+                int vIndex = rnd.Next(0, 3);
+                int hIndex = rnd.Next(0, 3);
+
+                List<(Coord, Coord)> cc = board.getLegalSwaps((vIndex, hIndex));
+                List<Swap> swaps = new List<Swap>();
+
+                foreach ((Coord, Coord) swap in cc)
+                {
+                    swaps.Add(board.CoordsToSwap(swap.Item1, swap.Item2));
+                }
+                
+            }
+
+
         }
     }
 }
