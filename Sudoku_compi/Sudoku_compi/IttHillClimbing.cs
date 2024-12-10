@@ -40,7 +40,7 @@ namespace Sudoku_compi
 
             while (attempts <= MaxAttempts) {
                 //First swap till optimum is reached
-                SwapTillOptimum(OptimumCeiling);
+                SwapTilOptimum(OptimumCeiling);
 
                 // Don't do random walk in last iteration (as it will just scramble the board)
                 if (attempts == MaxAttempts) {
@@ -65,7 +65,7 @@ namespace Sudoku_compi
             Elapsed = SW.Elapsed;
         }
 
-        private void SwapTillOptimum(int ceiling) //ceiling determines how many long the swapping will continue without a score delta above 0
+        private void SwapTilOptimum(int ceiling) //ceiling determines how many long the swapping will continue without a score delta above 0
         {
             int count = 0;
 
