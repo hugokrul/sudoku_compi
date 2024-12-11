@@ -103,34 +103,6 @@ namespace Sudoku_compi
             return 9 - lineInumerable.Distinct().Count();
         }
 
-        public int boardHeuristic(int[,] b)
-        {
-            int h = 0;
-            List<int> line = [];
-
-            for (int i = 0; i < b.GetLength(0); i++)
-            {
-                for (int j = 0; j < b.GetLength(1); j++)
-                {
-                    line.Add(b[i, j]);
-                }
-                h += lineHeuristic(line.ToArray());
-                line.Clear();
-            }
-
-            for (int i = 0; i < b.GetLength(0); i++)
-            {
-                for (int j = 0; j < b.GetLength(1); j++)
-                {
-                    line.Add(b[j,i]);
-                }
-                h += lineHeuristic(line.ToArray());
-                line.Clear();
-            }
-
-            return h;
-        }
-
         // returns a board where all the zeros are filled in with numbers available in that box
         public void fillBoard()
         {
@@ -249,43 +221,6 @@ namespace Sudoku_compi
             List<int> lineList = lineInumerable.ToList();
             // checks if there are no duplicates without 0
             return lineList.Count == lineList.Distinct().Count();
-        }
-
-        // returns if the state board is possible
-        // input is a board, so we can check it for future states too
-        public bool checkBoard(int[,] b)
-        {
-            List<bool> checkedHorizontalLines = [];
-            List<bool> checkedVerticalLines = [];
-
-            List<int> horizontalLine = [];
-            List<int> verticalLine = [];
-            
-            // checks all the horizontal lines with checkLine
-            for (int i = 0; i < b.GetLength(0); i++)
-            {
-                for (int j = 0; j < b.GetLength(1); j++)
-                {
-                    horizontalLine.Add(b[i, j]);
-                }
-                checkedHorizontalLines.Add(checkLine(horizontalLine));
-                horizontalLine.Clear();
-            }
-
-            // checks all the vertical lines with checkLine
-            for (int i = 0; i < b.GetLength(0); i++)
-            {
-                for (int j = 0; j < b.GetLength(1); j++)
-                {
-                    verticalLine.Add(b[j, i]);
-                }
-                checkedVerticalLines.Add(checkLine(verticalLine));
-                verticalLine.Clear();
-            }
-
-            // if all lines are correct, i.e., the list is full of Trues and bigger then 0
-            return  checkedHorizontalLines.TrueForAll(x => x) && checkedHorizontalLines.Count > 0 
-                    && checkedVerticalLines.TrueForAll(x => x) && checkedVerticalLines.Count > 0;
         }
 
         // prints the board in a pretty way
