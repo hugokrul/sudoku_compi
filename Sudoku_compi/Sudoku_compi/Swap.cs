@@ -110,6 +110,11 @@ namespace Sudoku_compi
             }
             Score = totalDelta;
         }
+
+        public override string ToString()
+        {
+            return $"Coord1: {Coord1.ToString()}, Coord2: {Coord2.ToString()}";
+        }
     }
 
 }

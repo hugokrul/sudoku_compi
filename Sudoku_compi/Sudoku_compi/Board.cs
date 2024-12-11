@@ -140,7 +140,7 @@ namespace Sudoku_compi
             }
         }
 
-        public List<(Coord, Coord)> GetLegalSwaps((int, int) box) //Here box is a coordinate which points to the specific 3x3 square we want the swaps from. Structured as x(vertical), y(horizontal) where 0,0 is topleft
+        public List<(Coord, Coord)> getLegalSwaps((int, int) box) //Here box is a coordinate which points to the specific 3x3 square we want the swaps from. Structured as x(vertical), y(horizontal) where 0,0 is topleft
         {
             List<(int, int)> unfixedCoordinates = [];
             List <(Coord, Coord)> swaps = [];
