@@ -76,7 +76,7 @@ namespace Sudoku_compi
                 int vIndex = rnd.Next(0, 3);
                 int hIndex = rnd.Next(0, 3);
 
-                List<(Coord, Coord)> cc = Board.GetLegalSwaps((vIndex, hIndex));
+                List<(Coord, Coord)> cc = Board.getLegalSwaps((vIndex, hIndex));
                 List<Swap> swaps = new List<Swap>();
 
                 foreach ((Coord, Coord) swap in cc)
@@ -126,7 +126,7 @@ namespace Sudoku_compi
             for (int i = 0; i < amount; i++)
             {
                 (int, int) box = (rnd.Next(3), rnd.Next(3));
-                List<(Coord, Coord)> legalSwaps = Board.GetLegalSwaps(box);
+                List<(Coord, Coord)> legalSwaps = Board.getLegalSwaps(box);
                 int randomIndex = rnd.Next(legalSwaps.Count);
                 Swap randomSwap = new Swap(legalSwaps[randomIndex].Item1, legalSwaps[randomIndex].Item2, Board);
                 Board.CommitSwap(randomSwap);

@@ -178,7 +178,7 @@ namespace Sudoku_compi
                 // Grid  digitdigit
                 //  81 digits with spaces in front
                 string boardString = File.ReadAllText(BoardFile);
-                if (Regex.IsMatch(File.ReadAllText(BoardFile), @"^Grid \d{2}\r?\n(\s\d){81}$", RegexOptions.Multiline))
+                if (Regex.IsMatch(File.ReadAllText(BoardFile), @"^Grid  \d{2}\r?\n(\s\d){81}$", RegexOptions.Multiline))
                 {
                     string[] strings = File.ReadAllLines(BoardFile);
                     // The boardname is the first element in the string
