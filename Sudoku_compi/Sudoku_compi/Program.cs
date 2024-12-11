@@ -6,12 +6,14 @@ namespace Sudoku_compi
     {
         static void Main(string[] args)
         {
-            Board board = new Board(@"../../../testBoards5.txt");
+            Board board = new Board(@"../../../testBoards5.txt");  
 
             IttHillClimbing algo = new IttHillClimbing(board);
-            
-            board.PrintBoard();
-            Console.WriteLine(board.checkBoard(board.board));
+            algo.Run();
+            algo.Board.PrintBoard();
+            Console.WriteLine("Attempts taken to solve: " + algo.AttemptsNeeded);
+            Console.WriteLine("Time taken to solve: " + algo.Elapsed);
+            Console.WriteLine("Total swaps made: " + algo.TotalSwaps);
         }
     }
 }
