@@ -15,10 +15,12 @@ namespace Sudoku_compi
         public int AttemptsNeeded;
         public int TotalSwaps = 0;
 
+        public int failed;
+
         // Algo settings
-        private int MaxAttempts = 100;
-        private int OptimumCeiling = 100;
-        private int RandomSwaps = 20;
+        public int MaxAttempts = 400;
+        public int OptimumCeiling = 400;
+        public int RandomSwaps = 15;
 
         // Algo board
         public Board Board;
@@ -44,6 +46,7 @@ namespace Sudoku_compi
 
                 // Don't do random walk in last iteration (as it will just scramble the board)
                 if (attempts == MaxAttempts) {
+                    failed++;
                     Console.WriteLine("Was not able to solve the board.");
                     break;
                 }
@@ -56,7 +59,7 @@ namespace Sudoku_compi
                 else
                 {
                     AttemptsNeeded = attempts;
-                    Console.WriteLine("Succesfully solved!");
+                    //Console.WriteLine("Succesfully solved!");
                     break;
                 }
                 attempts++;
@@ -123,6 +126,7 @@ namespace Sudoku_compi
 
         private void RandomWalk(int amount)
         {
+            
             for (int i = 0; i < amount; i++)
             {
                 (int, int) box = (rnd.Next(3), rnd.Next(3));
