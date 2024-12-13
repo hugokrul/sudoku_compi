@@ -54,7 +54,7 @@ namespace Sudoku_compi
                 // Replace value of coord1 with value of coord2
                 col1[coord1.Y] = b.board[coord2.X, coord2.Y];
                 // Calculate new value of col1
-                int hValCol1 = b.lineHeuristic(col1);
+                int hValCol1 = b.LineHeuristic(col1);
                 // Calculate difference between old and new column value;
                 // formula = old - new; a positive value means the row has gotten closer to completion
                 int col1Delta = b.ColHVals[coord1.X] - hValCol1;
@@ -68,7 +68,7 @@ namespace Sudoku_compi
                     .ToArray();
                 
                 col2[coord2.Y] = b.board[coord1.X, coord1.Y];
-                int hValCol2 = b.lineHeuristic(col2);
+                int hValCol2 = b.LineHeuristic(col2);
                 int col2Delta = b.ColHVals[coord2.X] - hValCol2;
                 totalDelta += col2Delta;
 
@@ -90,7 +90,7 @@ namespace Sudoku_compi
                     .ToArray();
                 
                 row1[coord1.X] = b.board[coord2.X, coord2.Y];
-                int hValRow1 = b.lineHeuristic(row1);
+                int hValRow1 = b.LineHeuristic(row1);
                 int row1Delta = b.RowHVals[coord1.Y] - hValRow1;
                 totalDelta += row1Delta;
 
@@ -102,7 +102,7 @@ namespace Sudoku_compi
                     .ToArray();
                 
                 row2[coord2.X] = b.board[coord1.X, coord1.Y];
-                int hValRow2 = b.lineHeuristic(row2);
+                int hValRow2 = b.LineHeuristic(row2);
                 int row2Delta = b.RowHVals[coord2.Y] - hValRow2;
                 totalDelta += row2Delta;
 
