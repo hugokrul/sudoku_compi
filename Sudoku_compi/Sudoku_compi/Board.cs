@@ -7,34 +7,41 @@ using System.Text.RegularExpressions;
 
 namespace Sudoku_compi
 {
+    /// <summary>
+    /// Contains the Sudoku board and methods that operate on the board.
+    /// </summary>
     public class Board
     {
-        static Random rnd = new Random();
-        public int[,] board = new int[9, 9];
+        static Random rnd = new Random();        
         public string BoardName;
         public string BoardFile;
-        public bool[,] boolMatrix = new bool[9, 9]; //True if it contains a fixed value
+        
+        public int[,] board = new int[9, 9];
+        // Index is true if value is a start value and thus immutable and cannot be swapped
+        public bool[,] boolMatrix = new bool[9, 9];
+        // Contains a list of all unique pairs of coordinates that can be swapped per 3x3 block
         public List<(Coord,Coord)>[,] AllSwaps = new List<(Coord,Coord)>[3,3];
-        // Keeps track of the scores of the rows i.e. rowHVals[1] gives the score of row 1 
+        // Keeps track of the heuristic values of the rows i.e. rowHVals[1] gives the heuristic value of row 1
         public int[] RowHVals = new int[9];
-        // Keeps track of the scores of the columns
+        // Keeps track of the heuristic values of the columns
         public int[] ColHVals = new int[9];
-        // Tracks total score of the board; -1 is placeholder
-        public int BoardHScore = -1;
+        // Tracks total heuristic value of the board
+        public int BoardHScore;
 
         public Board(string boardFile)
         {
             BoardFile = boardFile;
-            // loads the board
             // file content has to match: @"(Grid  \d\d*\r\n)+( \d){81,81}"
             List<Coord>[,] mutableCoords = LoadBoard();
             CalcAllSwaps(mutableCoords);
-            fillBoard();
+            FillBoard();
             InitHValArrays();
             HValBoard();
         }
 
-        // At the start of the program, calculate heuristic values of all rows and columns
+        /// <summary>
+        /// Initializes the arrays that track the heuristic values of the rows and columns, RowHVals and ColHVals.
+        /// </summary>
         public void InitHValArrays() 
         {            
             // Initiate rowHVals and colHVals; 
@@ -44,17 +51,19 @@ namespace Sudoku_compi
                     .Select(j => board[j, i])
                     .ToArray();
 
-                RowHVals[i] = lineHeuristic(row);
+                RowHVals[i] = LineHeuristic(row);
 
                 int[] col = Enumerable.Range(0, 9)
                     .Select(j => board[i, j])
                     .ToArray();
 
-                ColHVals[i] = lineHeuristic(col);
+                ColHVals[i] = LineHeuristic(col);
             }
         }
 
-        // Calculates the total heuristic value of the board; call at the start after InitHValArrays
+        /// <summary>
+        /// Initializes the total heuristic value of board.
+        /// </summary>
         public void HValBoard ()
         {
             int tempBoardScore = 0;
@@ -65,16 +74,23 @@ namespace Sudoku_compi
             BoardHScore = tempBoardScore;
         }
 
-        public int lineHeuristic(int[] line)
+        /// <summary>
+        /// Calculates the total heuristic value of a given line. 
+        /// </summary>
+        /// <param name="line">The line to calculate heuristic value of.</param>
+        /// <returns></returns>
+        public int LineHeuristic(int[] line)
         {
             var lineInumerable = from x in line
                                  where x > 0
                                  select x;
             return 9 - lineInumerable.Distinct().Count();
         }
-
-        // returns a board where all the zeros are filled in with numbers available in that box
-        public void fillBoard()
+        
+        /// <summary>
+        /// Substitutes all zero values on the board for a value 1 <= n <= 9 such that values 1..9 appear once in each 3x3 block.
+        /// </summary>
+        public void FillBoard()
         {
             for (int boxX = 0; boxX < 3; boxX++)
             {
@@ -92,7 +108,7 @@ namespace Sudoku_compi
                         }
                     }
 
-                    // filles the 0 with random numbers available
+                    // fills the 0 with random numbers available
                     for (int i = 0; i < 3; i++)
                     {
                         for (int j = 0; j < 3; j++)
@@ -110,6 +126,10 @@ namespace Sudoku_compi
             }
         }
 
+        /// <summary>
+        /// Calculates all unique pairs of Coords that can be swapped for each 3x3 block on the board.
+        /// </summary>
+        /// <param name="mutableCoords">Two dimensional array that contains a list of mutable coordinates per 3x3 block.</param>
         public void CalcAllSwaps(List<Coord>[,] mutableCoords) 
         {
             for (int x = 0; x < 3; x++)
@@ -133,6 +153,11 @@ namespace Sudoku_compi
             }
         }
 
+        /// <summary>
+        /// Reads Sudoku board text file and transforms it into two dimensional array. 
+        /// Also creates two dimensional array of lists of mutable coordinates per 3x3 block.
+        /// </summary>
+        /// <returns>Two dimensional array that contains a list of mutable coordinates per 3x3 block</returns>
         public List<Coord>[,] LoadBoard()
         {
             // checks if the file exists
@@ -148,25 +173,25 @@ namespace Sudoku_compi
                     // The boardname is the first element in the string
                     BoardName = strings[0];
                     // the next elements are the numbers in the board, the first element is "" because of a space at the front, we skip that space
-                    string[] BoardNumbers = strings[1].Split(' ').Skip(1).ToArray();
+                    string[] boardNumbers = strings[1].Split(' ').Skip(1).ToArray();
 
-                    List<Coord>[,] MutableCoords = new List<Coord>[3,3];
+                    List<Coord>[,] mutableCoords = new List<Coord>[3,3];
 
                     for (int i = 0; i < board.GetLength(0); i++)
                     {
                         for (int j = 0; j < board.GetLength(1); j++)
                         {
                             // first x digits are the first line, next x digits are the next line, etc
-                            int val = int.Parse(BoardNumbers[board.GetLength(0) * i + j]);
+                            int val = int.Parse(boardNumbers[board.GetLength(0) * i + j]);
                             board[i, j] = val;
 
-                            if (MutableCoords[i / 3, j / 3] == null)
-                                MutableCoords[i / 3, j / 3] = new List<Coord>();
+                            if (mutableCoords[i / 3, j / 3] == null)
+                                mutableCoords[i / 3, j / 3] = new List<Coord>();
 
                             if (val == 0) 
                             { 
                                 boolMatrix[i, j] = false;                                 
-                                MutableCoords[i / 3, j / 3].Add(new Coord(i,j));
+                                mutableCoords[i / 3, j / 3].Add(new Coord(i,j));
                             }
                             else 
                             { 
@@ -175,35 +200,20 @@ namespace Sudoku_compi
                         }
                     }
 
-                    return MutableCoords;
+                    return mutableCoords;
                 } else
                 {
-                    Console.WriteLine("non correct format");
-                    return null;
+                    throw new ArgumentException("Incorrect Sudoku format.");
                 }
             } else
             {
-                Console.WriteLine("file does not exist");
-                return null;
+                throw new ArgumentException("File does not exist.");
             }
         }
 
-
-        // checks if a line is correct, i.e., it contains no duplicate digits except 0
-        public bool checkLine(List<int> line)
-        {
-            // C# has no map, so
-            // with inumerable we can easy map over the digits
-            var lineInumerable = from x in line
-                                 where x > 0
-                                 select x;
-
-            List<int> lineList = lineInumerable.ToList();
-            // checks if there are no duplicates without 0
-            return lineList.Count == lineList.Distinct().Count();
-        }
-
-        // prints the board in a pretty way
+        /// <summary>
+        /// Pretty prints the Sudoku board.
+        /// </summary>
         public void PrintBoard()
         {
             Console.WriteLine(@"/ - - - - - - - - - - - \");
@@ -222,6 +232,10 @@ namespace Sudoku_compi
             Console.WriteLine(@"\ - - - - - - - - - - - /");
         }
 
+        /// <summary>
+        /// Commits a given Swap to the board. 
+        /// </summary>
+        /// <param name="swap">The Swap to be committed.</param>
         public void CommitSwap(Swap swap)
         {
             // Swap the values on the board
