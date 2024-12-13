@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -13,6 +14,7 @@ namespace Sudoku_compi
         public string BoardName;
         public string BoardFile;
         public bool[,] boolMatrix = new bool[9, 9]; //True if it contains a fixed value
+        public List<(Coord,Coord)>[,] AllSwaps = new List<(Coord,Coord)>[3,3];
         // Keeps track of the scores of the rows i.e. rowHVals[1] gives the score of row 1 
         public int[] RowHVals = new int[9];
         // Keeps track of the scores of the columns
@@ -25,44 +27,12 @@ namespace Sudoku_compi
             BoardFile = boardFile;
             // loads the board
             // file content has to match: @"(Grid  \d\d*\r\n)+( \d){81,81}"
-            LoadBoard();
+            List<Coord>[,] mutableCoords = LoadBoard();
+            CalcAllSwaps(mutableCoords);
             fillBoard();
             InitHValArrays();
             HValBoard();
         }
-
-        // Was for testing purposes
-        /*
-        public void AltLoadBoard()
-        {
-            // checks if the content of the file matches:
-            // Grid  digitdigit
-            //  81 digits with spaces in front
-            if (Regex.IsMatch(BoardFile, @"^(\s\d){81}$"))
-            {
-                // The boardname is the first element in the string
-                // the next elements are the numbers in the board, the first element is "" because of a space at the front, we skip that space
-                string[] BoardNumbers = BoardFile.Split(' ').Skip(1).ToArray();
-
-                for (int i = 0; i < board.GetLength(0); i++)
-                {
-                    for (int j = 0; j < board.GetLength(1); j++)
-                    {
-                        // first x digits are the first line, next x digits are the next line, etc
-                        int val = int.Parse(BoardNumbers[board.GetLength(0) * i + j]);
-                        board[i, j] = val;
-
-                        if (val == 0) { boolMatrix[i, j] = false; }
-                        else { boolMatrix[i, j] = true; }
-                    }
-                }
-            } 
-            else
-            {
-                Console.WriteLine("Incorrect format");
-            }
-        }
-        */
 
         // At the start of the program, calculate heuristic values of all rows and columns
         public void InitHValArrays() 
@@ -140,36 +110,30 @@ namespace Sudoku_compi
             }
         }
 
-        public List<(Coord, Coord)> getLegalSwaps((int, int) box) //Here box is a coordinate which points to the specific 3x3 square we want the swaps from. Structured as x(vertical), y(horizontal) where 0,0 is topleft
+        public void CalcAllSwaps(List<Coord>[,] mutableCoords) 
         {
-            List<(int, int)> unfixedCoordinates = [];
-            List <(Coord, Coord)> swaps = [];
-            int X = box.Item1 * 3;
-            int Y = box.Item2 * 3;
-
-            for (int x = X; x < X + 3;  x++)
+            for (int x = 0; x < 3; x++)
             {
-                for (int y = Y; y < Y + 3; y++)
+                for (int y = 0; y < 3; y++)
                 {
-                    if (!boolMatrix[x, y]) unfixedCoordinates.Add((x, y));
+                    if (AllSwaps[x,y] == null)
+                        AllSwaps[x,y] = new List<(Coord, Coord)>();
+
+                    int c = mutableCoords[x, y].Count;
+                    for (int i = 0; i < c; i++)
+                    {
+                        Coord c1 = mutableCoords[x,y][i];
+                        for (int j = i + 1; j < c; j++)
+                        {
+                            Coord c2 = mutableCoords[x,y][j];
+                            AllSwaps[x,y].Add((c1,c2));
+                        }
+                    }
                 }
             }
-
-            int c = unfixedCoordinates.Count;
-            for (int i = 0; i < c; i++)
-            {
-                (int, int) c1 = unfixedCoordinates[i];
-                for (int j = i + 1; j < c; j++)
-                {
-                    (int, int) c2 = unfixedCoordinates[j];
-                    swaps.Add((new Coord(c1.Item1, c1.Item2), new Coord(c2.Item1, c2.Item2)));
-                }
-            }
-
-            return swaps;
         }
 
-        public void LoadBoard()
+        public List<Coord>[,] LoadBoard()
         {
             // checks if the file exists
             if (File.Exists(BoardFile))
@@ -186,6 +150,8 @@ namespace Sudoku_compi
                     // the next elements are the numbers in the board, the first element is "" because of a space at the front, we skip that space
                     string[] BoardNumbers = strings[1].Split(' ').Skip(1).ToArray();
 
+                    List<Coord>[,] MutableCoords = new List<Coord>[3,3];
+
                     for (int i = 0; i < board.GetLength(0); i++)
                     {
                         for (int j = 0; j < board.GetLength(1); j++)
@@ -194,17 +160,31 @@ namespace Sudoku_compi
                             int val = int.Parse(BoardNumbers[board.GetLength(0) * i + j]);
                             board[i, j] = val;
 
-                            if (val == 0) { boolMatrix[i, j] = false; }
-                            else { boolMatrix[i, j] = true; }
+                            if (MutableCoords[i / 3, j / 3] == null)
+                                MutableCoords[i / 3, j / 3] = new List<Coord>();
+
+                            if (val == 0) 
+                            { 
+                                boolMatrix[i, j] = false;                                 
+                                MutableCoords[i / 3, j / 3].Add(new Coord(i,j));
+                            }
+                            else 
+                            { 
+                                boolMatrix[i, j] = true; 
+                            }
                         }
                     }
+
+                    return MutableCoords;
                 } else
                 {
                     Console.WriteLine("non correct format");
+                    return null;
                 }
             } else
             {
                 Console.WriteLine("file does not exist");
+                return null;
             }
         }
 
