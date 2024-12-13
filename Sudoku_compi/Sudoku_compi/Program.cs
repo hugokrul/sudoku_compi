@@ -6,7 +6,7 @@ namespace Sudoku_compi
     {
         static void Main(string[] args)
         {
-            Board board = new Board(@"../../../testBoards5.txt");  
+            Board board = new Board(@"../../../testBoards2.txt");  
 
             IttHillClimbing algo = new IttHillClimbing(board);
             algo.Run();

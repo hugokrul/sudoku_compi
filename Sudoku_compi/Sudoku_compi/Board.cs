@@ -33,7 +33,7 @@ namespace Sudoku_compi
             BoardFile = boardFile;
             // file content has to match: @"(Grid  \d\d*\r\n)+( \d){81,81}"
             List<Coord>[,] mutableCoords = LoadBoard();
-            CalcAllSwaps(mutableCoords);
+            GenAllSwaps(mutableCoords);
             FillBoard();
             InitHValArrays();
             HValBoard();
@@ -130,7 +130,7 @@ namespace Sudoku_compi
         /// Calculates all unique pairs of Coords that can be swapped for each 3x3 block on the board.
         /// </summary>
         /// <param name="mutableCoords">Two dimensional array that contains a list of mutable coordinates per 3x3 block.</param>
-        public void CalcAllSwaps(List<Coord>[,] mutableCoords) 
+        public void GenAllSwaps(List<Coord>[,] mutableCoords) 
         {
             for (int x = 0; x < 3; x++)
             {
