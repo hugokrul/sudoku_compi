@@ -19,9 +19,9 @@ namespace Sudoku_compi
         public int TotalSwaps = 0;
 
         // Algo settings
-        private int MaxAttempts = 100;
-        private int OptimumCeiling = 100;
-        private int RandomSwaps = 20;
+        private int MaxAttempts = 400;
+        private int OptimumCeiling = 400;
+        private int RandomSwaps = 15;
 
         // Algo board
         public Board Board;
