@@ -5,6 +5,10 @@ using System.Threading.Tasks;
 
 namespace Sudoku_compi
 {
+    /// <summary>
+    /// Struct used to represent a swap of two coordinates. In the creation of a Swap no actual Board values are changed.
+    /// Only once the swap is committed in CommitSwap(Swap) the values of the board are actually changed.
+    /// </summary>
     public struct Swap 
     {
         // The total score of the swap, meaning the sum of delta scores of each line; positive is good
@@ -14,7 +18,6 @@ namespace Sudoku_compi
         // The coordinate of the second number to swap
         public Coord Coord2;
         // The value that is to be placed at the coordinate of the first number if the swap is committed; number that is at coordinates of coord2
-        // This field is just for ease of use and overview because otherwise a temp var has to be used in CommitSwap function.
         public int newValCoord1;
         // The value that is to be placed at the coordinate of the second number if the swap is committed 
         public int newValCoord2;
@@ -32,15 +35,16 @@ namespace Sudoku_compi
             Coord1 = coord1;
             Coord2 = coord2;
 
+            // Total change in overal heuristic value the swap makes on the heuristic value of the board
             int totalDelta = 0;
 
             newValCoord1 = b.board[coord2.X,coord2.Y];
             newValCoord2 = b.board[coord1.X,coord1.Y];
 
-            // If the two coords share the same column
+            // If the two coords share the same column the heuristic value of the column does not change so 
+            // just set the new column values to the current value 
             if (coord1.X == coord2.X)
             {
-                // Value of column does not change so just set the new column values to the current value 
                 newHValCol1 = b.ColHVals[coord1.X];
                 newHValCol2 = b.ColHVals[coord1.X];
             }
@@ -53,9 +57,9 @@ namespace Sudoku_compi
                 
                 // Replace value of coord1 with value of coord2
                 col1[coord1.Y] = b.board[coord2.X, coord2.Y];
-                // Calculate new value of col1
+                // Calculate new heuristic value of col1
                 int hValCol1 = b.LineHeuristic(col1);
-                // Calculate difference between old and new column value;
+                // Calculate difference in heuristic value between old and new column value;
                 // formula = old - new; a positive value means the row has gotten closer to completion
                 int col1Delta = b.ColHVals[coord1.X] - hValCol1;
                 totalDelta += col1Delta;
@@ -75,10 +79,9 @@ namespace Sudoku_compi
                 newHValCol2 = hValCol2;
             }
 
-            // If the two coords share the same row
+            // If the two coords share the same row the heuristic value does not change so just set the new row heuristic values to the current row value
             if (coord1.Y == coord2.Y)
             {
-                // Value of the row does not changeso just set the new row values to the current row value
                 newHValRow1 = b.RowHVals[coord1.Y];
                 newHValRow2 = b.RowHVals[coord1.Y];
             }

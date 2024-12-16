@@ -5,6 +5,9 @@ using System.Threading.Tasks;
 
 namespace Sudoku_compi
 {
+    /// <summary>
+    /// Struct that represents the coordinate of a cell on the board.
+    /// </summary>
     public struct Coord
     {
         public Coord(int x, int y)
