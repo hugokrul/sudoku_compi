@@ -31,7 +31,7 @@ namespace Sudoku_compi
         public Board(string boardFile)
         {
             BoardFile = boardFile;
-            // file content has to match: @"(Grid  \d\d*\r\n)+( \d){81,81}"
+            // file content has to match: @"(Grid  \d\d*\r\n)+( \d){81,81}" Use 2 spaces after Grid!
             List<Coord>[,] mutableCoords = LoadBoard();
             GenAllSwaps(mutableCoords);
             FillBoard();
